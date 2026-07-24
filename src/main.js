@@ -1,60 +1,104 @@
-import './style.css'
-import javascriptLogo from './assets/javascript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.js'
+const API_KEY = import.meta.env.VITE_NASA_API_KEY;
 
-document.querySelector('#app').innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${javascriptLogo}" class="framework" alt="JavaScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.js</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+const searchEngines = {
+  google: "https://www.google.com/search?q=",
+  bing: "https://www.bing.com/search?q=",
+  duckduckgo: "https://duckduckgo.com/?q=",
+  brave: "https://search.brave.com/search?q="
+};
 
-<div class="ticks"></div>
+function updateGreeting() {
+  const now = new Date();
+  const hour = now.getHours();
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-          <img class="button-icon" src="${javascriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+  let greeting;
+  if (hour < 5) {
+    greeting = "good night";
+  } else if (hour < 12) {
+    greeting = "good morning";
+  } else if (hour < 17) {
+    greeting = "good afternoon";
+  } else if (hour < 21) {
+    greeting = "good evening";
+  } else {
+    greeting = "good night";
+  }
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+  document.querySelector("#subtitle").textContent = greeting;
+}
 
-setupCounter(document.querySelector('#counter'))
+updateGreeting();
+setInterval(updateGreeting, 60000);
+
+function setBackground() {
+  fetch(`https://api.nasa.gov/planetary/apod?api_key=${API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.media_type === "image") {
+        const imageUrl = data.hdurl || data.url;
+        document.body.style.backgroundImage = `url(${imageUrl})`;
+      }
+    })
+    .catch(err => {
+      console.log("Failed to load background:", err.message);
+    });
+}
+
+setBackground();
+
+
+const engineSelect = document.querySelector("#engine-select");
+const savedEngine = localStorage.getItem("searchEngine") || "google";
+engineSelect.value = savedEngine;
+
+document.querySelector("#search-input").placeholder = `search ${savedEngine}`;
+
+engineSelect.addEventListener("change", () => {
+  const selected = engineSelect.value;
+  localStorage.setItem("searchEngine", selected);
+  document.querySelector("#search-input").placeholder = `search ${selected}`;
+});
+
+document.querySelector("#search-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const query = document.querySelector("#search-input").value.trim();
+  const engine = localStorage.getItem("searchEngine") || "google";
+
+  if (query) {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.7 }
+    });
+
+    setTimeout(() => {
+      window.location.href = `${searchEngines[engine]}${encodeURIComponent(query)}`;
+    }, 400);
+  }
+});
+
+document.querySelector("#settings-btn").addEventListener("click", () => {
+  document.querySelector("#settings-panel").classList.toggle("hidden");
+});
+
+document.querySelector("#close-settings").addEventListener("click", () => {
+  document.querySelector("#settings-panel").classList.add("hidden");
+});
+
+const themeBtn = document.querySelector("#theme-btn");
+
+function applyTheme(theme) {
+  document.body.setAttribute("data-theme", theme);
+}
+
+const savedTheme = localStorage.getItem("theme") || "light";
+applyTheme(savedTheme);
+
+themeBtn.addEventListener("click", () => {
+  const currentTheme = document.body.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", newTheme);
+  applyTheme(newTheme);
+});
+

@@ -2,12 +2,63 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>space-tab</title>
+    <title>new tab</title>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="hero">
+        <div class="greeting-container">
+          <h1 id="greeting">space tab</h1>
+          <h2 id="subtitle">good morning</h2>
+        </div>
+
+        <div class="search-container">
+          <form id="search-form">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="search google"
+              autocomplete="off"
+              autofocus
+            />
+          </form>
+        </div>
+      </div>
+
+      <button id="theme-btn">
+        <i data-lucide="moon" class="icon-moon"></i>
+        <i data-lucide="sun" class="icon-sun"></i>
+      </button>
+
+      <button id="settings-btn">
+        <i data-lucide="settings"></i>
+      </button>
+
+      <div id="settings-panel" class="hidden">
+        <h2>settings</h2>
+        <label for="engine-select">search engine</label>
+        <select id="engine-select">
+          <option value="google">Google</option>
+          <option value="bing">Bing</option>
+          <option value="duckduckgo">DuckDuckGo</option>
+          <option value="brave">Brave</option>
+        </select>
+        <button id="close-settings">
+          <i data-lucide="x"></i>
+          close
+        </button>
+      </div>
+
+      <div id="credits">made by neonxsl</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/main.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
   </body>
 </html>
